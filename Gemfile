@@ -57,3 +57,5 @@ group :development, :test do
 end
 
 gem 'rswag-ui' # UIは本番でも使うなら外に、そうでないなら development 内でもOK
+
+gem 'rack-cors'
