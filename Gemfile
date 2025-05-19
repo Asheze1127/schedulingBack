@@ -8,7 +8,9 @@ gem "puma", ">= 5.0"
 gem "bcrypt", "~> 3.1.7"
 gem "bootsnap", require: false
 gem "rack-cors"
-gem "rswag-ui" # 本番で Swagger UI を提供するならここでOK
+gem "rswag-api"       # ← グループ外に移動
+gem "rswag-specs"     # ← グループ外に移動
+gem "rswag-ui"        # Swagger UI（本番で使うならここ）
 
 # Windows用のタイムゾーンデータ
 gem "tzinfo-data", platforms: %i[ windows jruby ]
@@ -16,11 +18,4 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ]
   gem "rspec-rails"
-  gem "rswag-api"
-  gem "rswag-specs"
 end
-
-# ↓ spring は必要なら有効化（任意）
-# group :development do
-#   gem "spring"
-# end
