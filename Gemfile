@@ -48,3 +48,12 @@ end
 group :development, :test do
   gem 'rspec-rails'
 end
+
+
+group :development, :test do
+  gem 'rspec-rails'
+  gem 'rswag-api'
+  gem 'rswag-specs'
+end
+
+gem 'rswag-ui' # UIは本番でも使うなら外に、そうでないなら development 内でもOK

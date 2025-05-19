@@ -32,4 +32,5 @@ RSpec.describe Plan, type: :model do
       end_time: '2025-05-05 12:00:00'
     )
     expect(plan).to_not be_valid
+  end
 end
