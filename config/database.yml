@@ -2,7 +2,7 @@ default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  url: <%= ENV["DATABASE_URL"] %>
+  url: <%= ENV["postgresql://schedule_back_user:s2w7clQwIZdFuhSqSowz62Q0e6dz4J2W@dpg-d0q8jq2dbo4c73brceu0-a/schedule_back"] %>
 
 development:
   <<: *default
