@@ -1,59 +1,41 @@
-# syntax = docker/dockerfile:1
+# Dockerfile
 
-# Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
+# 使用するRubyのバージョンを指定
+# プロジェクトで使用しているバージョンに合わせて変更してください
 ARG RUBY_VERSION=3.2.3
-FROM registry.docker.com/library/ruby:$RUBY_VERSION-slim as base
+FROM ruby:$RUBY_VERSION-slim
 
-# Rails app lives here
-WORKDIR /rails
-
-# Set production environment
-ENV RAILS_ENV="production" \
-    BUNDLE_DEPLOYMENT="1" \
-    BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development"
-
-
-# Throw-away build stage to reduce size of final image
-FROM base as build
-
-# Install packages needed to build gems
+# --- 基本的な依存パッケージのインストール ---
+# build-essential: gemのビルドに必要なツール群
+# libpq-dev: PostgreSQLに接続するためのライブラリ
+# nodejs, yarn: JavaScriptのランタイムとパッケージマネージャ (アセットパイプラインで必要になる場合がある)
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libvips pkg-config
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    nodejs \
+    yarn
 
-# Install application gems
+# --- アプリケーションのコードを配置するディレクトリを作成 ---
+WORKDIR /app
+
+# --- Gemfileをコピーして、bundle installを実行 ---
+# GemfileとGemfile.lockを先にコピーすることで、gemのインストールがキャッシュされ、
+# 2回目以降のビルドが高速になります。
 COPY Gemfile Gemfile.lock ./
-RUN bundle install && \
-    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
-    bundle exec bootsnap precompile --gemfile
+RUN bundle config set --local without 'development test' && \
+    bundle install --jobs $(nproc) --retry 3
 
-# Copy application code
+# --- アプリケーションのコード全体をコピー ---
 COPY . .
 
-# Precompile bootsnap code for faster boot times
-RUN bundle exec bootsnap precompile app/ lib/
+# --- エントリーポイントスクリプトに実行権限を付与 ---
+# このスクリプトはコンテナ起動時に実行されます。
+COPY entrypoint.sh /usr/bin/
+RUN chmod +x /usr/bin/entrypoint.sh
+ENTRYPOINT ["entrypoint.sh"]
 
-
-# Final stage for app image
-FROM base
-
-# Install packages needed for deployment
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libsqlite3-0 libvips && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
-
-# Copy built artifacts: gems, application
-COPY --from=build /usr/local/bundle /usr/local/bundle
-COPY --from=build /rails /rails
-
-# Run and own only the runtime files as a non-root user for security
-RUN useradd rails --create-home --shell /bin/bash && \
-    chown -R rails:rails db log storage tmp
-USER rails:rails
-
-# Entrypoint prepares the database.
-ENTRYPOINT ["/rails/bin/docker-entrypoint"]
-
-# Start the server by default, this can be overwritten at runtime
+# --- Railsサーバーを起動 ---
+# ポート3000番を公開し、サーバーを起動します。
 EXPOSE 3000
-CMD ["./bin/rails", "server"]
+CMD ["rails", "server", "-b", "0.0.0.0"]

@@ -1,0 +1,30 @@
+# .github/workflows/sync_to_hf.yml
+
+name: Sync to Hugging Face hub
+
+on:
+  # mainブランチにプッシュされた時にこの処理を実行
+  push:
+    branches:
+      - main
+  
+  # 手動でも実行できるようにする
+  workflow_dispatch:
+
+jobs:
+  sync-to-hub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Push to hub
+        env:
+          # ステップ2で設定したHF_TOKENを読み込む
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          # ここにあなたのユーザー名とSpace名を入力してください
+          # 例: git push https://Asheze:$HF_TOKEN@huggingface.co/spaces/Asheze/schedulingBack main
+          git push https://Asheze:$HF_TOKEN@huggingface.co/spaces/AshezeschedulingBack main -f

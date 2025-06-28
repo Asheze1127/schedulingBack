@@ -1,0 +1,35 @@
+# docker-compose.yml
+
+version: '3.8'
+
+services:
+  # PostgreSQLデータベースサービス
+  db:
+    image: postgres:14-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=password # ここは任意のパスワードに変更してください
+    ports:
+      - "5432:5432"
+
+  # Railsアプリケーションサービス
+  web:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bin/rails s -b '0.0.0.0'"
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      # ここでRailsがDBに接続するためのURLを設定します
+      - DATABASE_URL=postgres://postgres:password@db:5432/postgres
+      - RAILS_ENV=development # 開発環境として起動
+      - RAILS_LOG_TO_STDOUT=true
+      - RAILS_SERVE_STATIC_FILES=true
+
+# データを永続化するための名前付きボリューム
+volumes:
+  postgres_data:
