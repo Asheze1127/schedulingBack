@@ -27,4 +27,4 @@ jobs:
         run: |
           # ここにあなたのユーザー名とSpace名を入力してください
           # 例: git push https://Asheze:$HF_TOKEN@huggingface.co/spaces/Asheze/schedulingBack main
-          git push https://Asheze:$HF_TOKEN@huggingface.co/spaces/AshezeschedulingBack main -f
+          git push https://Asheze:$HF_TOKEN@huggingface.co/spaces/Asheze/schedulingBack main -f
