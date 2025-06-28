@@ -35,6 +35,9 @@ COPY entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
 
+# アプリケーションが書き込むためのtmpとlogディレクトリを作成し、権限を付与
+RUN mkdir -p /app/tmp/pids && chmod -R 777 /app/tmp && mkdir -p /app/log && chmod -R 777 /app/log
+
 # --- Railsサーバーを起動 ---
 # ポート3000番を公開し、サーバーを起動します。
 EXPOSE 3000
