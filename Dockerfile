@@ -5,6 +5,11 @@
 ARG RUBY_VERSION=3.2.3
 FROM ruby:$RUBY_VERSION-slim
 
+# Railsの実行環境を「本番(production)」に設定
+ENV RAILS_ENV=production
+# 本番環境でログを標準出力に流す設定
+ENV RAILS_LOG_TO_STDOUT=true
+
 # --- 基本的な依存パッケージのインストール ---
 # build-essential: gemのビルドに必要なツール群
 # libpq-dev: PostgreSQLに接続するためのライブラリ
