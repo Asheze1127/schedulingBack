@@ -47,4 +47,4 @@ RUN mkdir -p /app/storage && chmod -R 777 /app/storage
 # --- Railsサーバーを起動 ---
 # ポート3000番を公開し、サーバーを起動します。
 EXPOSE 3000
-CMD ["rails", "server", "-b", "0.0.0.0"]
+CMD ["rails", "server", "-b", "0.0.0.0", "-e", "production"]
